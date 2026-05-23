@@ -1,0 +1,66 @@
+# "eduping" wake word — Piper TTS, English transliteration of 에듀핑
+#
+# Pivoted from VoxCPM/Korean after VoxCPM2 hung mid-training and the Korean
+# models maxed out at 41% recall — root cause was limited voice diversity
+# (~144 VoxCPM voice/quality combos vs 904 Piper speakers). See models/
+# directory for eduping_v1/v2/v3 Korean baselines.
+#
+# Piper en-us-libritts-high pronunciation of "eduping" is roughly
+# "EH-doo-ping" / "ED-yoo-ping", close enough to 에듀핑 for a Korean
+# speaker's pronunciation to trigger reliably.
+model_name: eduping
+
+target_phrases: ["eduping"]
+
+tts_backend: piper_vits
+
+n_samples: 25000
+n_samples_val: 5000
+n_background_samples: 2000
+n_background_samples_val: 500
+tts_batch_size: 50
+
+custom_negative_phrases:
+  - "edu"
+  - "ping"
+  - "edu ping"
+  - "education"
+  - "duping"
+  - "eduping"  # spelling variant, will be auto-modified
+
+# Piper TTS controls — these provide the voice diversity the Korean
+# experiments lacked (904 base speakers × 5 SLERP blends × 3 speeds).
+noise_scales: [0.98]
+noise_scale_ws: [0.98]
+length_scales: [0.75, 1.0, 1.25]
+slerp_weights: [0.2, 0.35, 0.5, 0.65, 0.8]
+
+piper_tts:
+  checkpoint_relpath: piper/en-us-libritts-high.pt
+
+data_dir: ./data
+output_dir: ./output/eduping
+
+augmentation:
+  clip_duration: 2.0
+  batch_size: 16
+  rounds: 3
+  background_paths: [./data/backgrounds]
+  rir_paths: [./data/rirs]
+
+model:
+  model_type: conv_attention
+  model_size: small
+
+steps: 75000
+learning_rate: 0.0001
+weight_decay: 0.01
+label_smoothing: 0.05
+max_negative_weight: 800
+target_fp_per_hour: 0.5
+
+batch_n_per_class:
+  positive: 50
+  adversarial_negative: 50
+  ACAV100M_sample: 1024
+  background_noise: 50

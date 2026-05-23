@@ -1,0 +1,20 @@
+# Virtual environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Large training/eval artifacts
+data/
+output/
+output_korean/
+samples_to_audit/
+
+# Local editor/tool state
+.claude/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
